@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-file-analyzer
+  labels:
+    app: log-file-analyzer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-file-analyzer
+  template:
+    metadata:
+      labels:
+        app: log-file-analyzer
+    spec:
+      containers:
+        - name: api
+          image: log-file-analyzer:local
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /v1/readyz
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-file-analyzer
+spec:
+  selector:
+    app: log-file-analyzer
+  ports:
+    - port: 80
+      targetPort: 8080
